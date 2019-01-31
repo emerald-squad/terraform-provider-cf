@@ -51,33 +51,33 @@ func resourceSpace() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      resourceStringHash,
 			},
-			"managers": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      resourceStringHash,
-			},
-			"developers": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      resourceStringHash,
-			},
-			"auditors": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      resourceStringHash,
-			},
+			// "managers": &schema.Schema{
+			// 	Type:     schema.TypeSet,
+			// 	Optional: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// 	Set:      resourceStringHash,
+			// },
+			// "developers": &schema.Schema{
+			// 	Type:     schema.TypeSet,
+			// 	Optional: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// 	Set:      resourceStringHash,
+			// },
+			// "auditors": &schema.Schema{
+			// 	Type:     schema.TypeSet,
+			// 	Optional: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// 	Set:      resourceStringHash,
+			// },
 		},
 	}
 }
 
-var typeToSpaceRoleMap = map[string]cfapi.SpaceRole{
-	"managers":   cfapi.SpaceRoleManager,
-	"developers": cfapi.SpaceRoleDeveloper,
-	"auditors":   cfapi.SpaceRoleAuditor,
-}
+// var typeToSpaceRoleMap = map[string]cfapi.SpaceRole{
+// 	"managers":   cfapi.SpaceRoleManager,
+// 	"developers": cfapi.SpaceRoleDeveloper,
+// 	"auditors":   cfapi.SpaceRoleAuditor,
+// }
 
 func resourceSpaceCreate(d *schema.ResourceData, meta interface{}) (err error) {
 
@@ -136,13 +136,13 @@ func resourceSpaceRead(d *schema.ResourceData, meta interface{}) (err error) {
 	d.Set("quota", space.QuotaGUID)
 	d.Set("allow_ssh", space.AllowSSH)
 
-	var users []interface{}
-	for t, r := range typeToSpaceRoleMap {
-		if users, err = sm.ListUsers(id, r); err != nil {
-			return
-		}
-		d.Set(t, schema.NewSet(resourceStringHash, users))
-	}
+	// var users []interface{}
+	// for t, r := range typeToSpaceRoleMap {
+	// 	if users, err = sm.ListUsers(id, r); err != nil {
+	// 		return
+	// 	}
+	// 	d.Set(t, schema.NewSet(resourceStringHash, users))
+	// }
 
 	if runningAsgs, err = session.ASGManager().Running(); err != nil {
 		return err
@@ -181,7 +181,7 @@ func resourceSpaceUpdate(d *schema.ResourceData, meta interface{}) (err error) {
 	spaceID := d.Id()
 	orgID := d.Get("org").(string)
 
-	om := session.OrgManager()
+	// om := session.OrgManager()
 	sm := session.SpaceManager()
 
 	if !newResource {
@@ -221,67 +221,67 @@ func resourceSpaceUpdate(d *schema.ResourceData, meta interface{}) (err error) {
 		}
 	}
 
-	usersRemoved := make(map[string]bool)
-	usersAdded := make(map[string]bool)
+	// usersRemoved := make(map[string]bool)
+	// usersAdded := make(map[string]bool)
 
-	for t, r := range typeToSpaceRoleMap {
-		old, new := d.GetChange(t)
-		remove, add := getListChanges(old, new)
+	// for t, r := range typeToSpaceRoleMap {
+	// 	old, new := d.GetChange(t)
+	// 	remove, add := getListChanges(old, new)
 
-		for _, uid := range remove {
-			session.Log.DebugMessage("Removing user '%s' from space '%s' with role '%s'.", uid, spaceID, r)
-			if err = sm.RemoveUser(spaceID, uid, r); err != nil {
-				return
-			}
-		}
-		for _, uid := range add {
-			session.Log.DebugMessage("Adding user '%s' to space '%s' with role '%s'.", uid, spaceID, r)
-			if err = om.AddUser(orgID, uid, cfapi.OrgRoleMember); err != nil {
-				return
-			}
-			if err = sm.AddUser(spaceID, uid, r); err != nil {
-				return
-			}
-		}
+	// 	for _, uid := range remove {
+	// 		session.Log.DebugMessage("Removing user '%s' from space '%s' with role '%s'.", uid, spaceID, r)
+	// 		if err = sm.RemoveUser(spaceID, uid, r); err != nil {
+	// 			return
+	// 		}
+	// 	}
+	// 	for _, uid := range add {
+	// 		session.Log.DebugMessage("Adding user '%s' to space '%s' with role '%s'.", uid, spaceID, r)
+	// 		if err = om.AddUser(orgID, uid, cfapi.OrgRoleMember); err != nil {
+	// 			return
+	// 		}
+	// 		if err = sm.AddUser(spaceID, uid, r); err != nil {
+	// 			return
+	// 		}
+	// 	}
 
-		for _, r := range remove {
-			usersRemoved[r] = true
-		}
-		for _, r := range add {
-			usersAdded[r] = true
-		}
-	}
+	// 	for _, r := range remove {
+	// 		usersRemoved[r] = true
+	// 	}
+	// 	for _, r := range add {
+	// 		usersAdded[r] = true
+	// 	}
+	// }
 
-	orgUsers := make(map[string]bool)
-	for _, r := range []cfapi.OrgRole{
-		cfapi.OrgRoleManager,
-		cfapi.OrgRoleBillingManager,
-		cfapi.OrgRoleAuditor} {
+	// orgUsers := make(map[string]bool)
+	// for _, r := range []cfapi.OrgRole{
+	// 	cfapi.OrgRoleManager,
+	// 	cfapi.OrgRoleBillingManager,
+	// 	cfapi.OrgRoleAuditor} {
 
-		var uu []interface{}
-		if uu, err = om.ListUsers(orgID, r); err != nil {
-			return
-		}
-		for _, u := range uu {
-			orgUsers[u.(string)] = true
-		}
-	}
-	for u := range usersRemoved {
+	// 	var uu []interface{}
+	// 	if uu, err = om.ListUsers(orgID, r); err != nil {
+	// 		return
+	// 	}
+	// 	for _, u := range uu {
+	// 		orgUsers[u.(string)] = true
+	// 	}
+	// }
+	// for u := range usersRemoved {
 
-		_, isOrgUser := orgUsers[u]
-		_, isSpaceUser := usersAdded[u]
+	// 	_, isOrgUser := orgUsers[u]
+	// 	_, isSpaceUser := usersAdded[u]
 
-		if !isOrgUser && !isSpaceUser {
+	// 	if !isOrgUser && !isSpaceUser {
 
-			session.Log.DebugMessage(
-				"Removing user '%s' from org '%s' as he/she no longer has an assigned role within the org.",
-				u, orgID)
+	// 		session.Log.DebugMessage(
+	// 			"Removing user '%s' from org '%s' as he/she no longer has an assigned role within the org.",
+	// 			u, orgID)
 
-			if err = om.RemoveUser(orgID, u, cfapi.OrgRoleMember); err != nil {
-				return
-			}
-		}
-	}
+	// 		if err = om.RemoveUser(orgID, u, cfapi.OrgRoleMember); err != nil {
+	// 			return
+	// 		}
+	// 	}
+	// }
 
 	return err
 }

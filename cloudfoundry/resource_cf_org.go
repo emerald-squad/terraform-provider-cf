@@ -31,33 +31,33 @@ func resourceOrg() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"managers": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      resourceStringHash,
-			},
-			"billing_managers": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      resourceStringHash,
-			},
-			"auditors": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      resourceStringHash,
-			},
+			// "managers": &schema.Schema{
+			// 	Type:     schema.TypeSet,
+			// 	Optional: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// 	Set:      resourceStringHash,
+			// },
+			// "billing_managers": &schema.Schema{
+			// 	Type:     schema.TypeSet,
+			// 	Optional: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// 	Set:      resourceStringHash,
+			// },
+			// "auditors": &schema.Schema{
+			// 	Type:     schema.TypeSet,
+			// 	Optional: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// 	Set:      resourceStringHash,
+			// },
 		},
 	}
 }
 
-var orgRoleMap = map[string]cfapi.OrgRole{
-	"managers":         cfapi.OrgRoleManager,
-	"billing_managers": cfapi.OrgRoleBillingManager,
-	"auditors":         cfapi.OrgRoleAuditor,
-}
+// var orgRoleMap = map[string]cfapi.OrgRole{
+// 	"managers":         cfapi.OrgRoleManager,
+// 	"billing_managers": cfapi.OrgRoleBillingManager,
+// 	"auditors":         cfapi.OrgRoleAuditor,
+// }
 
 func resourceOrgCreate(d *schema.ResourceData, meta interface{}) (err error) {
 
@@ -104,13 +104,13 @@ func resourceOrgRead(d *schema.ResourceData, meta interface{}) (err error) {
 	d.Set("name", org.Name)
 	d.Set("quota", org.QuotaGUID)
 
-	var users []interface{}
-	for t, r := range orgRoleMap {
-		if users, err = om.ListUsers(id, r); err != nil {
-			return err
-		}
-		d.Set(t, schema.NewSet(resourceStringHash, users))
-	}
+	// var users []interface{}
+	// for t, r := range orgRoleMap {
+	// 	if users, err = om.ListUsers(id, r); err != nil {
+	// 		return err
+	// 	}
+	// 	d.Set(t, schema.NewSet(resourceStringHash, users))
+	// }
 
 	return nil
 }
@@ -151,23 +151,23 @@ func resourceOrgUpdate(d *schema.ResourceData, meta interface{}) (err error) {
 		}
 	}
 
-	for t, r := range orgRoleMap {
-		old, new := d.GetChange(t)
-		remove, add := getListChanges(old, new)
+	// for t, r := range orgRoleMap {
+	// 	old, new := d.GetChange(t)
+	// 	remove, add := getListChanges(old, new)
 
-		for _, uid := range remove {
-			session.Log.DebugMessage("Removing user '%s' from organization '%s' with role '%s'.", uid, id, r)
-			if err = om.RemoveUser(id, uid, r); err != nil {
-				return err
-			}
-		}
-		for _, uid := range add {
-			session.Log.DebugMessage("Adding user '%s' to organization '%s' with role '%s'.", uid, id, r)
-			if err = om.AddUser(id, uid, r); err != nil {
-				return err
-			}
-		}
-	}
+	// 	for _, uid := range remove {
+	// 		session.Log.DebugMessage("Removing user '%s' from organization '%s' with role '%s'.", uid, id, r)
+	// 		if err = om.RemoveUser(id, uid, r); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// 	for _, uid := range add {
+	// 		session.Log.DebugMessage("Adding user '%s' to organization '%s' with role '%s'.", uid, id, r)
+	// 		if err = om.AddUser(id, uid, r); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 	return nil
 }
 
