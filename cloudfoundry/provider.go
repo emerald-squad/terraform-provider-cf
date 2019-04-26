@@ -66,7 +66,7 @@ func Provider() terraform.ResourceProvider {
 			"cloudfoundry_user":                  resourceUser(),
 			"cloudfoundry_domain":                resourceDomain(),
 			"cloudfoundry_private_domain_access": resourcePrivateDomainAccess(),
-			"cloudfoundry_asg":                   resourceAsg(),
+			//			"cloudfoundry_asg":                   resourceAsg(),
 			"cloudfoundry_org_quota":             resourceOrgQuota(),
 			"cloudfoundry_space_quota":           resourceSpaceQuota(),
 			"cloudfoundry_default_asg":           resourceDefaultAsg(),
